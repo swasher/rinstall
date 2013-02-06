@@ -14,6 +14,9 @@ PASSWEB=swasher
 #WEBSERVER=apache
 WEBSERVER=lighttpd
 
+#Корень файлопомойки WITH TAILING SLASH
+FILEROOT="/mnt/raid/video/"
+
 
 #### END SETUP ####
 
@@ -88,6 +91,41 @@ service lighttpd force-reload
 # htdigest так же зависит от apache2-utils
 
 hash=`echo -n "$USERWEB:RPC:$PASSWEB" | md5sum | cut -b -32`
-echo "$user:$realm:$hash" > /etc/lighttpd/htdigest
+echo "$USERWEB:RPC:$hash" > /etc/lighttpd/htdigest
 
+##########RUTORRENT################
+cd /var/www/
+svn checkout http://rutorrent.googlecode.com/svn/trunk/rutorrent
 
+#Редактируем файл конфиг `/var/www/rutorrent/conf/config.php`. 
+#Параметр $topdirectory устанавливаем на корень файлохранилища,
+#Не забываем о слеше в конце пути.
+# Пока ХЗ как сделать
+
+cd /var/www/rutorrent/plugins
+svn co http://rutorrent.googlecode.com/svn/trunk/plugins/erasedata
+svn co http://rutorrent.googlecode.com/svn/trunk/plugins/datadir
+svn co http://rutorrent.googlecode.com/svn/trunk/plugins/tracklabels
+svn co http://rutorrent.googlecode.com/svn/trunk/plugins/diskspace
+svn co http://rutorrent.googlecode.com/svn/trunk/plugins/_getdir
+svn co http://rutorrent.googlecode.com/svn/trunk/plugins/cpuload
+svn co http://rutorrent.googlecode.com/svn/trunk/plugins/geoip
+svn co http://rutorrent.googlecode.com/svn/trunk/plugins/trafic
+chmod 666 /var/www/rutorrent/share/settings
+
+#Для geoip устанавливаем расширение php:
+apt-get install -y php5-geoip && /etc/init.d/lighttpd force-reload
+
+chown -R www-data:www-data /var/www/rutorrent
+
+#Ставим "демона"
+wget http://libtorrent.rakshasa.no/attachment/wiki/RTorrentCommonTasks/rtorrentInit.sh?format=raw -O /etc/init.d/rtorrent1
+sedstring="s/user=\"user\"/user=\"$USER\"/"
+cat /etc/init.d/rtorrent1 | sed $sedstring > /etc/init.d/rtorrent
+rm /etc/init.d/rtorrent1
+
+chmod +x /etc/init.d/rtorrent
+update-rc.d rtorrent defaults
+
+#Стартуем, помолясь
+/etc/init.d/rtorrent start
