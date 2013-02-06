@@ -3,16 +3,16 @@
 #### SETUP SECTION  ####
 
 #user and password for rtorrent process
-USER = rtorrent
-PASS = pass
+USER=rtorrent
+PASS=pass
 
 #login and password for access rutorrent (user NOT created)
-USERWEB = swasher
-PASSWEB = swasher
+USERWEB=swasher
+PASSWEB=swasher
 
 #Choose web server
-#WEBSERVER = apache
-WEBSERVER = lighttpd
+#WEBSERVER=apache
+WEBSERVER=lighttpd
 
 
 #### END SETUP ####
@@ -44,7 +44,7 @@ chgrp -R rtorrent /home/$USER/.rtorrent.rc
 
 case $WEBSERVER in
     lighttpd)
-	apt-get install lighttpd
+	apt-get install -y lighttpd
 
 	cat >> /etc/lighttpd/conf-available/10-fastcgi.conf <<End-of-message
 	fastcgi.server = ( ".php" =>
@@ -65,7 +65,6 @@ case $WEBSERVER in
 	)
 	End-of-message
 
-	lighttpd-enable-mod auth
 	
 	cat >> /etc/lighttpd/conf-available/05-auth.conf <<End-of-message
 	auth.backend                   = "htdigest"
@@ -79,6 +78,11 @@ case $WEBSERVER in
             )
 	)
 	End-of-message
+
+	lighttpd-enable-mod fastcgi
+	lighttpd-enable-mod auth
+	service lighttpd force-reload
+	
 
 	;;
     
@@ -96,7 +100,5 @@ case $WEBSERVER in
 cd /etc/lighttpd
 hash=`echo -n "$USERWEB:RPC:$PASSWEB" | md5sum | cut -b -32`
 echo "$user:$realm:$hash" > /etc/lighttpd/htdigest
-
-
 
 
