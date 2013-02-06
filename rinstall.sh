@@ -39,56 +39,46 @@ chmod 666 .rtorrent.rc
 chown -R rtorrent /home/$USER/.rtorrent.rc
 chgrp -R rtorrent /home/$USER/.rtorrent.rc
 
-####
-#
 
-case $WEBSERVER in
-    lighttpd)
-	apt-get install -y lighttpd
 
-	cat >> /etc/lighttpd/conf-available/10-fastcgi.conf <<End-of-message
-	fastcgi.server = ( ".php" =>
-	    ((
-		"bin-path" => "/usr/bin/php5-cgi",
-		"socket" => "/tmp/php.socket",
-		"max-procs" => 2,
-		"idle-timeout" => 20,
-		"bin-environment" => (
-		"PHP_FCGI_CHILDREN" => "1",
-		"PHP_FCGI_MAX_REQUESTS" => "10000"
-		),
-		"bin-copy-environment" => (
-		"PATH", "SHELL", "USER"
-	         ),
-		"broken-scriptfilename" => "enable"
-	     ))
-	)
-	End-of-message
+apt-get install -y lighttpd
 
-	
-	cat >> /etc/lighttpd/conf-available/05-auth.conf <<End-of-message
-	auth.backend                   = "htdigest"
-	auth.backend.htdigest.userfile = "/etc/lighttpd/htdigest"
+cat >> /etc/lighttpd/conf-available/10-fastcgi.conf <<End-of-fastcgi
+fastcgi.server = ( ".php" =>
+    ((
+	"bin-path" => "/usr/bin/php5-cgi",
+	"socket" => "/tmp/php.socket",
+	"max-procs" => 2,
+	"idle-timeout" => 20,
+	"bin-environment" => (
+	"PHP_FCGI_CHILDREN" => "1",
+	"PHP_FCGI_MAX_REQUESTS" => "10000"
+	),
+	"bin-copy-environment" => (
+	"PATH", "SHELL", "USER"
+         ),
+	"broken-scriptfilename" => "enable"
+     ))
+)
+End-of-fastcgi
 
-	auth.require = ( "/RPC2" =>
-	    (
-            "method" => "digest",
-            "realm" => "rTorrent RPC",
-            "require" => "user=rtorrent"
-            )
-	)
-	End-of-message
 
-	lighttpd-enable-mod fastcgi
-	lighttpd-enable-mod auth
-	service lighttpd force-reload
-	
+cat >> /etc/lighttpd/conf-available/05-auth.conf <<End-of-auth
+auth.backend                   = "htdigest"
+auth.backend.htdigest.userfile = "/etc/lighttpd/htdigest"
+auth.require = ( "/RPC2" =>
+    (
+        "method" => "digest",
+        "realm" => "rTorrent RPC",
+        "require" => "user=rtorrent"
+        )
+)
+End-of-auth
 
-	;;
-    
-    apache)
-	#install apache
-	;;
+lighttpd-enable-mod fastcgi
+lighttpd-enable-mod auth
+service lighttpd force-reload
+
 
 
 #Создаем пароль, который будет спрашиваться при доступе через веб-интерфейс:
@@ -97,7 +87,6 @@ case $WEBSERVER in
 # Скрипт пишет файл напрямую, потому что htdigest спрашивает пароль из терминала
 # htdigest так же зависит от apache2-utils
 
-cd /etc/lighttpd
 hash=`echo -n "$USERWEB:RPC:$PASSWEB" | md5sum | cut -b -32`
 echo "$user:$realm:$hash" > /etc/lighttpd/htdigest
 
