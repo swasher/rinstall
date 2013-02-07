@@ -93,6 +93,12 @@ service lighttpd force-reload
 hash=`echo -n "$USERWEB:RPC:$PASSWEB" | md5sum | cut -b -32`
 echo "$USERWEB:RPC:$hash" > /etc/lighttpd/htdigest
 
+
+#Качаем дополнительные скрипты
+cd /home/$USER
+wget https://raw.github.com/swasher/rinstall/master/creator.sh
+chmod 744 creator.sh
+
 ##########RUTORRENT################
 cd /var/www/
 svn checkout http://rutorrent.googlecode.com/svn/trunk/rutorrent
