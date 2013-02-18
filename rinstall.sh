@@ -25,7 +25,8 @@ apt-get update -y && apt-get upgrade -y
 apt-get install -y subversion php5-cgi screen apache2-utils php5-cli
 apt-get install -y rtorrent
 
-useradd $USER -p $PASS
+useradd $USER
+echo $USER:$PASS | chpasswd
 
 # echo $?
 # возвращает код ошибки от useradd
@@ -65,6 +66,21 @@ fastcgi.server = ( ".php" =>
 )
 End-of-fastcgi
 
+cat >> /etc/lighttpd/conf-available/10-scgi.conf.conf <<End-of-scgi
+server.modules += ( "mod_scgi" )
+
+scgi.server = (
+                "/RPC2" =>
+                  ( "127.0.0.1" =>
+                    (
+                      "host" => "127.0.0.1",
+                      "port" => 5000,
+                      "check-local" => "disable",
+                      "disable-time" => 0,
+                    )
+                  )
+              )
+End-of-scgi
 
 cat >> /etc/lighttpd/conf-available/05-auth.conf <<End-of-auth
 auth.backend                   = "htdigest"
@@ -79,9 +95,9 @@ auth.require = ( "/RPC2" =>
 End-of-auth
 
 lighttpd-enable-mod fastcgi
+lighttpd-enable-mod scgi
 lighttpd-enable-mod auth
 service lighttpd force-reload
-
 
 
 #Создаем пароль, который будет спрашиваться при доступе через веб-интерфейс:
@@ -92,12 +108,16 @@ service lighttpd force-reload
 
 hash=`echo -n "$USERWEB:RPC:$PASSWEB" | md5sum | cut -b -32`
 echo "$USERWEB:RPC:$hash" > /etc/lighttpd/htdigest
+chmod 600 /etc/lighttpd/htdigest
 
 
 #Качаем дополнительные скрипты
 cd /home/$USER
 wget https://raw.github.com/swasher/rinstall/master/creator.sh
 chmod 744 creator.sh
+
+wget https://raw.github.com/swasher/rinstall/master/remove_mjbignore.sh
+chmod 744 remove_mjbignore.sh
 
 ##########RUTORRENT################
 cd /var/www/
