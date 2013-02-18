@@ -66,7 +66,7 @@ fastcgi.server = ( ".php" =>
 )
 End-of-fastcgi
 
-cat >> /etc/lighttpd/conf-available/10-scgi.conf.conf <<End-of-scgi
+cat >> /etc/lighttpd/conf-available/10-scgi.conf <<End-of-scgi
 server.modules += ( "mod_scgi" )
 
 scgi.server = (
@@ -93,6 +93,12 @@ auth.require = ( "/RPC2" =>
         )
 )
 End-of-auth
+
+#################################################################################
+#################################################################################
+# В модуле auth заменить юзера rtorrent на переменную
+#################################################################################
+#################################################################################
 
 lighttpd-enable-mod fastcgi
 lighttpd-enable-mod scgi
