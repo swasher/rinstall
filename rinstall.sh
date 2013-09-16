@@ -21,32 +21,29 @@ FILEROOT="/mnt/raid/video/"
 XMLRPCVERSION=stable
 
 #rtorrent version 0.9.2|0.9.3
+#libtorrent version will choose on depending
 RTORRRENTVERSION=0.9.3
 
 #### END SETUP ####
 
-if [[ $EUID -ne 0 ]]; then
-  echo "This script must be run as root" 1>&2
-  exit 1
-fi
+#if [[ $EUID -ne 0 ]]; then
+#  echo "This script must be run as root" 1>&2
+#  exit 1
+#fi
 
 if [ "$RTORRRENTVERSION" != "0.9.3" ] && [ "$RTORRRENTVERSION" != "0.9.2" ]; then
   echo "$RTORRRENTVERSION version is not 0.9.3 or 0.9.2!"
   exit 1
 fi
 
-if ["$RTORRRENTVERSION" = "0.9.3"]; then
-  $LIBTORRENTVERSION=0.13.3
+if [ $RTORRRENTVERSION == "0.9.3" ]; then
+  LIBTORRENTVERSION="0.13.3"
 fi
 
-if "$RTORRRENTVERSION" = "0.9.2"; then
-  $LIBTORRENTVERSION=0.13.2
+if [ $RTORRRENTVERSION == "0.9.2" ]; then
+  LIBTORRENTVERSION="0.13.2"
 fi
 
-echo $RTORRRENTVERSION
-echo $LIBTORRENTVERSION
-
-exit 1
 
 #apt-get update -y && apt-get upgrade -y
 apt-get purge -y rtorrent  libxmlrpc-c3 libxmlrpc-c3-dev libxmlrpc-core-c3 libxmlrpc-core-c3-dev
@@ -62,9 +59,6 @@ libtool libcurl4-openssl-dev libsigc++-2.0-dev libncurses5-dev libcppunit-dev
 useradd -c "Torrent User" -d /home/$USER -m -s /bin/bash $USER
 echo $USER:$PASS | chpasswd
 
-# echo $?
-# возвращает код ошибки от useradd
-
 cd /home/$USER
 mkdir torrents
 mkdir session
@@ -75,10 +69,9 @@ chmod 666 .rtorrent.rc
 chown -R rtorrent:rtorrent /home/$USER/
 
 
-
 ############ xmlrpc
 cd ~
-svn co https://xmlrpc-c.svn.sourceforge.net/svnroot/xmlrpc-c/$XMLRPC-VERSION xmlrpc-c
+svn co https://xmlrpc-c.svn.sourceforge.net/svnroot/xmlrpc-c/$XMLRPCVERSION xmlrpc-c
 cd xmlrpc-с
 ./configure --prefix=/usr \
   --enable-libxml2-backend \
@@ -89,23 +82,30 @@ cd xmlrpc-с
 make
 sudo checkinstall -D --pkgversion=1 -y
 
+read -p "Press [Enter]"
+
 ############# libtorrent
 cd ~
-curl http://libtorrent.rakshasa.no/downloads/libtorrent-$LIBTORRENT-VERSION.tar.gz | tar xz
-libtorrent-$LIBTORRENT-VERSION
+curl http://libtorrent.rakshasa.no/downloads/libtorrent-$LIBTORRENTVERSION.tar.gz | tar xz
+libtorrent-$LIBTORRENTVERSION
 ./autogen.sh
 ./configure --prefix=/usr --disable-debug --with-posix-fallocate
 make -j2
 sudo checkinstall -D -y
 
+read -p "Press [Enter]"
+
 ############## rtorrent
 cd ~
-curl http://libtorrent.rakshasa.no/downloads/rtorrent-$RTORRENT-VERSION.tar.gz | tar xz
-cd rtorrent-$RTORRENT-VERSION
+curl http://libtorrent.rakshasa.no/downloads/rtorrent-$RTORRENTVERSION.tar.gz | tar xz
+cd rtorrent-$RTORRENTVERSION
 ./autogen.sh
 ./configure --prefix=/usr --with-xmlrpc-c
 make -j2
 checkinstall -D -y
+
+read -p "Press [Enter]"
+
 ldconfig
 
 
