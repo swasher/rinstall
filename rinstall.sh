@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 #### SETUP SECTION  ####
 
@@ -17,9 +17,36 @@ WEBSERVER=lighttpd
 #Корень файлопомойки WITH TAILING SLASH
 FILEROOT="/mnt/raid/video/"
 
+# stable|advanced
+XMLRPCVERSION=stable
+
+#rtorrent version 0.9.2|0.9.3
+RTORRRENTVERSION=0.9.3
 
 #### END SETUP ####
 
+if [[ $EUID -ne 0 ]]; then
+  echo "This script must be run as root" 1>&2
+  exit 1
+fi
+
+if [ "$RTORRRENTVERSION" != "0.9.3" ] && [ "$RTORRRENTVERSION" != "0.9.2" ]; then
+  echo "$RTORRRENTVERSION version is not 0.9.3 or 0.9.2!"
+  exit 1
+fi
+
+if ["$RTORRRENTVERSION" = "0.9.3"]; then
+  $LIBTORRENTVERSION=0.13.3
+fi
+
+if "$RTORRRENTVERSION" = "0.9.2"; then
+  $LIBTORRENTVERSION=0.13.2
+fi
+
+echo $RTORRRENTVERSION
+echo $LIBTORRENTVERSION
+
+exit 1
 
 #apt-get update -y && apt-get upgrade -y
 apt-get purge -y rtorrent libtorrent11 libxmlrpc-c3 libxmlrpc-c3-dev libxmlrpc-core-c3 libxmlrpc-core-c3-dev
@@ -46,12 +73,40 @@ chown -R rtorrent:rtorrent /home/$USER/
 
 
 
+############ xmlrpc
+cd ~
+svn co https://xmlrpc-c.svn.sourceforge.net/svnroot/xmlrpc-c/$XMLRPC-VERSION xmlrpc-c
+cd xmlrpc-с
+./configure --prefix=/usr \
+  --enable-libxml2-backend \
+  --disable-libwww-client \
+  --disable-wininet-client \
+  --disable-abyss-server \
+  --disable-cgi-server
+make
+sudo checkinstall -D --pkgversion=1 -y
+
+############# libtorrent
+cd ~
+curl http://libtorrent.rakshasa.no/downloads/libtorrent-$LIBTORRENT-VERSION.tar.gz | tar xz
+libtorrent-$LIBTORRENT-VERSION
+./autogen.sh
+./configure --prefix=/usr --disable-debug --with-posix-fallocate
+make -j2
+sudo checkinstall -D -y
+
+############## rtorrent
+cd ~
+curl http://libtorrent.rakshasa.no/downloads/rtorrent-$RTORRENT-VERSION.tar.gz | tar xz
+cd rtorrent-$RTORRENT-VERSION
+./autogen.sh
+./configure --prefix=/usr --with-xmlrpc-c
+make -j2
+checkinstall -D -y
+ldconfig
+
+
 exit 1
-
-
-
-
-apt-get install -y lighttpd
 
 cat >> /etc/lighttpd/conf-available/10-fastcgi.conf <<End-of-fastcgi
 fastcgi.server = ( ".php" =>
