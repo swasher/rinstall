@@ -21,27 +21,33 @@ FILEROOT="/mnt/raid/video/"
 #### END SETUP ####
 
 
-apt-get update -y && apt-get upgrade -y
-apt-get install -y subversion php5-cgi screen apache2-utils php5-cli
-apt-get install -y rtorrent
+#apt-get update -y && apt-get upgrade -y
+apt-get purge -y rtorrent libtorrent11 libxmlrpc-c3 libxmlrpc-c3-dev libxmlrpc-core-c3 libxmlrpc-core-c3-dev
 
-useradd $USER
+sudo apt-get install -y screen php5 php5-geoip php5-cgi php5-cli apache2-utils curl \
+subversion make autoconf autotools-dev automake libtool libcurl4-openssl-dev \
+libsigc++-2.0-dev pkg-config libncurses5-dev checkinstall g++ libcppunit-dev
+
+
+useradd -c "Torrent User" -d /home/$USER -m -s /bin/bash $USER
 echo $USER:$PASS | chpasswd
 
 # echo $?
 # возвращает код ошибки от useradd
 
-cd /home
-mkdir $USER
-cd rtorrent
+cd /home/$USER
 mkdir torrents
 mkdir session
 
 wget https://raw.github.com/swasher/rinstall/master/rtorrent.rc -O .rtorrent.rc
 
 chmod 666 .rtorrent.rc
-chown -R rtorrent /home/$USER/.rtorrent.rc
-chgrp -R rtorrent /home/$USER/.rtorrent.rc
+chown -R rtorrent:rtorrent /home/$USER/
+
+
+
+exit 1
+
 
 
 
@@ -130,12 +136,10 @@ cd /var/www/
 svn checkout http://rutorrent.googlecode.com/svn/trunk/rutorrent
 
 #Редактируем файл конфиг `/var/www/rutorrent/conf/config.php`. 
-#Параметр $topdirectory устанавливаем на корень файлохранилища,
-#Не забываем о слеше в конце пути.
-# Пока ХЗ как сделать
-
-
-perl -pi -e "s/$topDirectory = '\/'/$topDirectory = '$FILEROOT'/g" /var/www/rutorrent/conf/config.php
+#Параметр $topdirectory устанавливаем на корень файлохранилища, не забываем о слеше в конце пути.
+#
+# как-то так, но непонятно как экранировать слеши в переменной fileroot
+# perl -pi -e "s/\$topDirectory \= '\/'/\$topDirectory $FILEROOT/g" /var/www/rutorrent/conf/config.php
 
 cd /var/www/rutorrent/plugins
 svn co http://rutorrent.googlecode.com/svn/trunk/plugins/erasedata
