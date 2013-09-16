@@ -49,11 +49,14 @@ echo $LIBTORRENTVERSION
 exit 1
 
 #apt-get update -y && apt-get upgrade -y
-apt-get purge -y rtorrent libtorrent11 libxmlrpc-c3 libxmlrpc-c3-dev libxmlrpc-core-c3 libxmlrpc-core-c3-dev
+apt-get purge -y rtorrent  libxmlrpc-c3 libxmlrpc-c3-dev libxmlrpc-core-c3 libxmlrpc-core-c3-dev
+apt-get purge -y libtorrent11
 
-sudo apt-get install -y screen php5 php5-geoip php5-cgi php5-cli apache2-utils curl \
-subversion make autoconf autotools-dev automake libtool libcurl4-openssl-dev \
-libsigc++-2.0-dev pkg-config libncurses5-dev checkinstall g++ libcppunit-dev
+sudo apt-get install -y screen subversion \
+g++ make automake pkg-config autoconf autotools-dev checkinstall\
+php5  php5-cgi php5-cli php5-geoip \
+apache2-utils curl \
+libtool libcurl4-openssl-dev libsigc++-2.0-dev libncurses5-dev libcppunit-dev
 
 
 useradd -c "Torrent User" -d /home/$USER -m -s /bin/bash $USER
