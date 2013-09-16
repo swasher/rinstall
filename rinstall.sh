@@ -134,6 +134,9 @@ svn checkout http://rutorrent.googlecode.com/svn/trunk/rutorrent
 #Не забываем о слеше в конце пути.
 # Пока ХЗ как сделать
 
+
+perl -pi -e "s/$topDirectory = '\/'/$topDirectory = '$FILEROOT'/g" /var/www/rutorrent/conf/config.php
+
 cd /var/www/rutorrent/plugins
 svn co http://rutorrent.googlecode.com/svn/trunk/plugins/erasedata
 svn co http://rutorrent.googlecode.com/svn/trunk/plugins/datadir
