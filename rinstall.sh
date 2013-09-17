@@ -91,7 +91,9 @@ cd xmlrpc-c
 make
 checkinstall -D --pkgversion=1 -y
 
-read -p "Press [Enter]"
+echo "Pause 10 sec. XMLRPC install ok?"
+sleep 10
+#read -p "Press [Enter]"
 
 
 ############# libtorrent
@@ -103,7 +105,9 @@ cd libtorrent-$LIBTORRENTVERSION
 make -j2
 sudo checkinstall -D -y
 
-read -p "Press [Enter]"
+echo "Pause 10 sec. Libtorrent install ok?"
+sleep 10
+#read -p "Press [Enter]"
 
 ############## rtorrent
 cd ~
@@ -114,7 +118,9 @@ cd rtorrent-$RTORRENTVERSION
 make -j2
 checkinstall -D -y
 
-read -p "Press [Enter]"
+echo "Pause 10 sec. Rtorrent install ok?"
+sleep 10
+#read -p "Press [Enter]"
 
 ldconfig
 
@@ -206,8 +212,6 @@ if [ $WEBSERVER = apache ]; then
    apache_install
 fi
 
-exit 1
-
 
 #Качаем дополнительные скрипты
 cd /home/$USER
@@ -222,8 +226,8 @@ chmod 744 remove_mjbignore.sh
 cd /var/www/
 svn checkout http://rutorrent.googlecode.com/svn/trunk/rutorrent
 
-#Редактируем файл конфиг `/var/www/rutorrent/conf/config.php`. 
-#Параметр $topdirectory устанавливаем на корень файлохранилища, не забываем о слеше в конце пути.
+#Нужно отредактировать конфиг `/var/www/rutorrent/conf/config.php`. 
+#Параметр $topdirectory устанавить на корень файлохранилища (слеше в конце пути)
 #
 # как-то так, но непонятно как экранировать слеши в переменной fileroot
 # perl -pi -e "s/\$topDirectory \= '\/'/\$topDirectory $FILEROOT/g" /var/www/rutorrent/conf/config.php
@@ -240,15 +244,14 @@ svn co http://rutorrent.googlecode.com/svn/trunk/plugins/trafic
 chmod 666 /var/www/rutorrent/share/settings
 
 #Для geoip устанавливаем расширение php:
-apt-get install -y php5-geoip && /etc/init.d/lighttpd force-reload
+apt-get install -y php5-geoip
+/etc/init.d/lighttpd force-reload
 
 chown -R www-data:www-data /var/www/rutorrent
 
 #Ставим "демона"
-wget http://libtorrent.rakshasa.no/attachment/wiki/RTorrentCommonTasks/rtorrentInit.sh?format=raw -O /etc/init.d/rtorrent1
-sedstring="s/user=\"user\"/user=\"$USER\"/"
-cat /etc/init.d/rtorrent1 | sed $sedstring > /etc/init.d/rtorrent
-rm /etc/init.d/rtorrent1
+wget http://libtorrent.rakshasa.no/attachment/wiki/RTorrentCommonTasks/rtorrentInit.sh?format=raw -O /etc/init.d/rtorrent
+perl -pi -e "s/user=\"user\"/user=\"rtorrent\"/g" /etc/init.d/rtorrent
 
 chmod +x /etc/init.d/rtorrent
 update-rc.d rtorrent defaults
