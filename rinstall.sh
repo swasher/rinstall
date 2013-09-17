@@ -22,20 +22,14 @@ XMLRPCVERSION=stable
 
 #rtorrent version 0.9.2|0.9.3
 #libtorrent version will choose on depending
-RTORRRENTVERSION=0.9.3
+RTORRENTVERSION=0.9.3
 
 #### END SETUP ####
 
 function checkresult
 {
-apt-get install rar
 if [ $? -gt 0 ]; then
-  set +x verbose
-  echo
   echo *** ERROR ***
-  echo "$1"
-  echo
-  set -e
   exit 1
 fi
 }
@@ -124,8 +118,12 @@ read -p "Press [Enter]"
 
 ldconfig
 
+#############################################
+# WEBSERVER
 
-
+function lighttpd_install
+{
+apt-get install -y lighttpd
 cat >> /etc/lighttpd/conf-available/10-fastcgi.conf <<End-of-fastcgi
 fastcgi.server = ( ".php" =>
     ((
@@ -179,13 +177,6 @@ End-of-auth
 #################################################################################
 #################################################################################
 
-lighttpd-enable-mod fastcgi
-lighttpd-enable-mod scgi
-lighttpd-enable-mod auth
-service lighttpd force-reload
-
-exit 1
-
 # Создаем пароль, который будет спрашиваться при доступе через веб-интерфейс:
 # Руками использоваласт команда
 # htdigest -c /etc/lighttpd/htdigest "rTorrent RPC" rtorrent
@@ -196,6 +187,27 @@ hash=`echo -n "$USERWEB:RPC:$PASSWEB" | md5sum | cut -b -32`
 echo "$USERWEB:RPC:$hash" > /etc/lighttpd/htdigest
 chmod 600 /etc/lighttpd/htdigest
 
+lighttpd-enable-mod fastcgi
+lighttpd-enable-mod scgi
+lighttpd-enable-mod auth
+service lighttpd force-reload
+}
+
+function apache_install
+{
+apt-get install -y apache2
+}
+
+if [ $WEBSERVER = lighttpd ]; then
+   lighttpd_install
+fi
+
+if [ $WEBSERVER = apache ]; then
+   apache_install
+fi
+
+exit 1
+
 
 #Качаем дополнительные скрипты
 cd /home/$USER
@@ -204,6 +216,7 @@ chmod 744 creator.sh
 
 wget https://raw.github.com/swasher/rinstall/master/remove_mjbignore.sh
 chmod 744 remove_mjbignore.sh
+
 
 ##########RUTORRENT################
 cd /var/www/
