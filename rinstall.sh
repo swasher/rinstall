@@ -26,6 +26,21 @@ RTORRRENTVERSION=0.9.3
 
 #### END SETUP ####
 
+function checkresult()
+{
+apt-get install rar
+if [ $? -gt 0 ]; then
+  set +x verbose
+  echo
+  echo *** ERROR ***
+  echo "$1"
+  echo
+  set -e
+  exit 1
+fi
+}
+
+
 if [[ $EUID -ne 0 ]]; then
   echo "This script must be run as root" 1>&2
   exit 1
@@ -80,9 +95,14 @@ cd xmlrpc-с
   --disable-abyss-server \
   --disable-cgi-server
 make
+checkresult()
+
 sudo checkinstall -D --pkgversion=1 -y
+checkresult()
 
 read -p "Press [Enter]"
+
+exit 1
 
 ############# libtorrent
 cd ~
