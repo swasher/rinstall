@@ -46,16 +46,16 @@ if [[ $EUID -ne 0 ]]; then
   exit 1
 fi
 
-if [ "$RTORRRENTVERSION" != "0.9.3" ] && [ "$RTORRRENTVERSION" != "0.9.2" ]; then
-  echo "$RTORRRENTVERSION version is not 0.9.3 or 0.9.2!"
+if [ "$RTORRENTVERSION" != "0.9.3" ] && [ "$RTORRENTVERSION" != "0.9.2" ]; then
+  echo "$RTORRENTVERSION version is not 0.9.3 or 0.9.2!"
   exit 1
 fi
 
-if [ $RTORRRENTVERSION == "0.9.3" ]; then
+if [ $RTORRENTVERSION == "0.9.3" ]; then
   LIBTORRENTVERSION="0.13.3"
 fi
 
-if [ $RTORRRENTVERSION == "0.9.2" ]; then
+if [ $RTORRENTVERSION == "0.9.2" ]; then
   LIBTORRENTVERSION="0.13.2"
 fi
 
@@ -103,7 +103,7 @@ read -p "Press [Enter]"
 ############# libtorrent
 cd ~
 curl http://libtorrent.rakshasa.no/downloads/libtorrent-$LIBTORRENTVERSION.tar.gz | tar xz
-libtorrent-$LIBTORRENTVERSION
+cd libtorrent-$LIBTORRENTVERSION
 ./autogen.sh
 ./configure --prefix=/usr --disable-debug --with-posix-fallocate
 make -j2
@@ -125,7 +125,6 @@ read -p "Press [Enter]"
 ldconfig
 
 
-exit 1
 
 cat >> /etc/lighttpd/conf-available/10-fastcgi.conf <<End-of-fastcgi
 fastcgi.server = ( ".php" =>
@@ -185,8 +184,9 @@ lighttpd-enable-mod scgi
 lighttpd-enable-mod auth
 service lighttpd force-reload
 
+exit 1
 
-#Создаем пароль, который будет спрашиваться при доступе через веб-интерфейс:
+# Создаем пароль, который будет спрашиваться при доступе через веб-интерфейс:
 # Руками использоваласт команда
 # htdigest -c /etc/lighttpd/htdigest "rTorrent RPC" rtorrent
 # Скрипт пишет файл напрямую, потому что htdigest спрашивает пароль из терминала
