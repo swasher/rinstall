@@ -26,6 +26,32 @@ RTORRENTVERSION=0.9.3
 
 #### END SETUP ####
 
+function clean_system
+{
+echo Cleaning system
+apt-get purge -y lighttpd
+apt-get purge -y rtorrent  libxmlrpc-c3 libxmlrpc-c3-dev libxmlrpc-core-c3 libxmlrpc-core-c3-dev
+apt-get purge -y libtorrent11
+
+rm -r /etc/lighttpd/
+rm -r /var/www/rutorrent/
+rm -r /etc/init.d/rtorrent
+
+userdel rtorrent
+rm -r /home/rtorrent/
+
+dpkg -r xmlrpc
+dpkg -r libtorrent
+dpkg -r rtorrent
+
+exit 0
+}
+
+
+[[ $1 == 'clean' ]] && clean_system || echo "It is assumed that the system is clean"
+
+
+
 function checkresult
 {
 if [ $? -gt 0 ]; then
