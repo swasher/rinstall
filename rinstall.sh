@@ -26,6 +26,8 @@ RTORRENTVERSION=0.9.3
 
 #### END SETUP ####
 
+SETUPDIR=${PWD##*/}
+
 function clean_system
 {
 echo Cleaning system
@@ -102,10 +104,9 @@ wget https://raw.github.com/swasher/rinstall/master/rtorrent.rc -O .rtorrent.rc
 chmod 666 .rtorrent.rc
 chown -R rtorrent:rtorrent /home/$USER/
 
-mkdir ~/r_install
 
 ############ xmlrpc
-cd ~/r_install
+cd $SETUPDIR
 svn co https://xmlrpc-c.svn.sourceforge.net/svnroot/xmlrpc-c/$XMLRPCVERSION xmlrpc-c
 cd xmlrpc-c
 ./configure --prefix=/usr \
@@ -123,7 +124,7 @@ sleep 10
 
 
 ############# libtorrent
-cd ~/r_install
+cd $SETUPDIR
 curl http://libtorrent.rakshasa.no/downloads/libtorrent-$LIBTORRENTVERSION.tar.gz | tar xz
 cd libtorrent-$LIBTORRENTVERSION
 ./autogen.sh
@@ -137,7 +138,7 @@ sleep 10
 
 
 ############## rtorrent
-cd ~/r_install
+cd $SETUPDIR
 curl http://libtorrent.rakshasa.no/downloads/rtorrent-$RTORRENTVERSION.tar.gz | tar xz
 cd rtorrent-$RTORRENTVERSION
 ./autogen.sh
