@@ -26,10 +26,10 @@ RTORRRENTVERSION=0.9.3
 
 #### END SETUP ####
 
-#if [[ $EUID -ne 0 ]]; then
-#  echo "This script must be run as root" 1>&2
-#  exit 1
-#fi
+if [[ $EUID -ne 0 ]]; then
+  echo "This script must be run as root" 1>&2
+  exit 1
+fi
 
 if [ "$RTORRRENTVERSION" != "0.9.3" ] && [ "$RTORRRENTVERSION" != "0.9.2" ]; then
   echo "$RTORRRENTVERSION version is not 0.9.3 or 0.9.2!"
@@ -50,7 +50,7 @@ apt-get purge -y rtorrent  libxmlrpc-c3 libxmlrpc-c3-dev libxmlrpc-core-c3 libxm
 apt-get purge -y libtorrent11
 
 sudo apt-get install -y screen subversion \
-g++ make automake pkg-config autoconf autotools-dev checkinstall\
+g++ make automake pkg-config autoconf autotools-dev checkinstall \
 php5  php5-cgi php5-cli php5-geoip \
 apache2-utils curl \
 libtool libcurl4-openssl-dev libsigc++-2.0-dev libncurses5-dev libcppunit-dev
