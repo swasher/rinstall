@@ -26,7 +26,7 @@ RTORRRENTVERSION=0.9.3
 
 #### END SETUP ####
 
-function checkresult()
+function checkresult
 {
 apt-get install rar
 if [ $? -gt 0 ]; then
@@ -68,7 +68,7 @@ sudo apt-get install -y screen subversion \
 g++ make automake pkg-config autoconf autotools-dev checkinstall \
 php5  php5-cgi php5-cli php5-geoip \
 apache2-utils curl \
-libtool libcurl4-openssl-dev libsigc++-2.0-dev libncurses5-dev libcppunit-dev
+libtool libcurl4-openssl-dev libsigc++-2.0-dev libncurses5-dev libcppunit-dev libxml2-dev
 
 
 useradd -c "Torrent User" -d /home/$USER -m -s /bin/bash $USER
@@ -87,7 +87,7 @@ chown -R rtorrent:rtorrent /home/$USER/
 ############ xmlrpc
 cd ~
 svn co https://xmlrpc-c.svn.sourceforge.net/svnroot/xmlrpc-c/$XMLRPCVERSION xmlrpc-c
-cd xmlrpc-с
+cd xmlrpc-c
 ./configure --prefix=/usr \
   --enable-libxml2-backend \
   --disable-libwww-client \
@@ -95,14 +95,10 @@ cd xmlrpc-с
   --disable-abyss-server \
   --disable-cgi-server
 make
-checkresult()
-
-sudo checkinstall -D --pkgversion=1 -y
-checkresult()
+checkinstall -D --pkgversion=1 -y
 
 read -p "Press [Enter]"
 
-exit 1
 
 ############# libtorrent
 cd ~
