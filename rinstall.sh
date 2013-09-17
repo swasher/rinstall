@@ -7,15 +7,15 @@ USER=rtorrent
 PASS=pass
 
 #login and password for access rutorrent (user NOT created)
-USERWEB=swasher
-PASSWEB=swasher
+USERWEB=rtorrent
+PASSWEB=bingo
 
 #Choose web server
 #WEBSERVER=apache
 WEBSERVER=lighttpd
 
-#Корень файлопомойки WITH TAILING SLASH
-FILEROOT="/mnt/raid/video/"
+#Корень файлопомойки WITH TRAILING SLASH
+FILEROOT="/mnt/raid/"
 
 # stable|advanced
 XMLRPCVERSION=stable
@@ -69,17 +69,17 @@ useradd -c "Torrent User" -d /home/$USER -m -s /bin/bash $USER
 echo $USER:$PASS | chpasswd
 
 cd /home/$USER
-mkdir torrents
-mkdir session
+mkdir torrents session
 
 wget https://raw.github.com/swasher/rinstall/master/rtorrent.rc -O .rtorrent.rc
 
 chmod 666 .rtorrent.rc
 chown -R rtorrent:rtorrent /home/$USER/
 
+mkdir ~/r_install
 
 ############ xmlrpc
-cd ~
+cd ~/r_install
 svn co https://xmlrpc-c.svn.sourceforge.net/svnroot/xmlrpc-c/$XMLRPCVERSION xmlrpc-c
 cd xmlrpc-c
 ./configure --prefix=/usr \
@@ -97,7 +97,7 @@ sleep 10
 
 
 ############# libtorrent
-cd ~
+cd ~/r_install
 curl http://libtorrent.rakshasa.no/downloads/libtorrent-$LIBTORRENTVERSION.tar.gz | tar xz
 cd libtorrent-$LIBTORRENTVERSION
 ./autogen.sh
@@ -109,8 +109,9 @@ echo "Pause 10 sec. Libtorrent install ok?"
 sleep 10
 #read -p "Press [Enter]"
 
+
 ############## rtorrent
-cd ~
+cd ~/r_install
 curl http://libtorrent.rakshasa.no/downloads/rtorrent-$RTORRENTVERSION.tar.gz | tar xz
 cd rtorrent-$RTORRENTVERSION
 ./autogen.sh
@@ -191,7 +192,7 @@ End-of-auth
 
 hash=`echo -n "$USERWEB:RPC:$PASSWEB" | md5sum | cut -b -32`
 echo "$USERWEB:RPC:$hash" > /etc/lighttpd/htdigest
-chmod 600 /etc/lighttpd/htdigest
+chmod 644 /etc/lighttpd/htdigest
 
 lighttpd-enable-mod fastcgi
 lighttpd-enable-mod scgi
@@ -241,6 +242,7 @@ svn co http://rutorrent.googlecode.com/svn/trunk/plugins/_getdir
 svn co http://rutorrent.googlecode.com/svn/trunk/plugins/cpuload
 svn co http://rutorrent.googlecode.com/svn/trunk/plugins/geoip
 svn co http://rutorrent.googlecode.com/svn/trunk/plugins/trafic
+svn co http://rutorrent.googlecode.com/svn/trunk/plugins/check_port
 chmod 666 /var/www/rutorrent/share/settings
 
 #Для geoip устанавливаем расширение php:

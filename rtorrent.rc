@@ -126,14 +126,8 @@ system.file_allocate.set = yes
 
 execute = {sh,-c,/usr/bin/php /var/www/rutorrent/php/initplugins.php &}
 
-#log.execute = /home/rtorrent/execute.log
-#execute_log = /home/rtorrent/execute.log
-
-#log.open_file = "rtorrent.log", "/home/rtorrent/execute.log"
-#log.add_output = "info", "rtorrent.log"
-#log.add_output = "storage_*", "rtorrent.log"
-#log.add_output = "torrent_*", "rtorrent.log"
-
+log.execute = /home/rtorrent/exec.log
+log.xmlrpc  = /home/rtorrent/xmlrpc.log
 
 #создание директории закачки+создание mjbignore
 system.method.set_key=event.download.inserted_new,create_struct,"d.open= ; f.multicall=,\"execute={sh,/home/rtorrent/creator.sh,$f.get_frozen_path=,$f.get_path=}\""
