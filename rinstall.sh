@@ -26,7 +26,7 @@ RTORRENTVERSION=0.9.3
 
 #### END SETUP ####
 
-SETUPDIR=${PWD##*/}
+SETUPDIR=$(pwd)
 
 function clean_system
 {
@@ -38,6 +38,7 @@ apt-get purge -y libtorrent11
 rm -r /etc/lighttpd/
 rm -r /var/www/rutorrent/
 rm -r /etc/init.d/rtorrent
+rm -r /var/run/S-$USER
 
 userdel rtorrent
 rm -r /home/rtorrent/
@@ -278,8 +279,11 @@ apt-get install -y php5-geoip
 
 chown -R www-data:www-data /var/www/rutorrent
 
-#Ставим "демона"
-wget http://libtorrent.rakshasa.no/attachment/wiki/RTorrentCommonTasks/rtorrentInit.sh?format=raw -O /etc/init.d/rtorrent
+#Install "daemon"
+#There is two version from Rakshasa - sh ("Highly Compatible, fewer features") and bash ("More features, may not work on some systems")
+#Choose one.
+#wget http://libtorrent.rakshasa.no/attachment/wiki/RTorrentCommonTasks/rtorrentInit.sh?format=raw -O /etc/init.d/rtorrent
+wget http://libtorrent.rakshasa.no/attachment/wiki/RTorrentCommonTasks/rtorrentInit.bash?format=raw -O /etc/init.d/rtorrent
 perl -pi -e "s/user=\"user\"/user=\"rtorrent\"/g" /etc/init.d/rtorrent
 
 chmod +x /etc/init.d/rtorrent
