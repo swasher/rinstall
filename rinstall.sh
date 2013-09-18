@@ -279,6 +279,10 @@ apt-get install -y php5-geoip
 
 chown -R www-data:www-data /var/www/rutorrent
 
+cd /var/www/rutorrent
+find share/ -type d -exec chmod 777 {} \;
+find share/ -type f -exec chmod 666 {} \;
+
 #Install "daemon"
 #There is two version from Rakshasa - sh ("Highly Compatible, fewer features") and bash ("More features, may not work on some systems")
 #Choose one.
