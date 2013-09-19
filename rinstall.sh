@@ -8,7 +8,7 @@ PASS=pass
 
 #login and password for access rutorrent (user NOT created)
 USERWEB=rtorrent
-PASSWEB=bingo
+PASSWEB=rtorrent
 REALMWEB="rTorrent RPC"
 
 #Choose web server
@@ -219,15 +219,13 @@ End-of-auth
 # Скрипт пишет файл напрямую, потому что htdigest спрашивает пароль из терминала
 # htdigest так же зависит от apache2-utils
 
-
+#Method 1
 hash=`echo -n "$USERWEB:$REALMWEB:$PASSWEB" | md5sum | cut -b -32`
 echo "$USERWEB:$REALMWEB:$hash" > /etc/lighttpd/htdigest
-
+#Method 2
 echo ${USERWEB}:${REALMWEB}:$(printf "${USERWEB}:${REALMWEB}:${PASSWEB}" | md5sum - | sed -e 's/\s\+-//') >>  /etc/lighttpd/htdigest
 
-
 chmod 644 /etc/lighttpd/htdigest
-
 
 lighttpd-enable-mod fastcgi
 lighttpd-enable-mod scgi
@@ -293,8 +291,9 @@ find share/ -type f -exec chmod 666 {} \;
 #Install "daemon"
 #There is two version from Rakshasa - sh ("Highly Compatible, fewer features") and bash ("More features, may not work on some systems")
 #Choose one.
-#wget http://libtorrent.rakshasa.no/attachment/wiki/RTorrentCommonTasks/rtorrentInit.sh?format=raw -O /etc/init.d/rtorrent
-wget http://libtorrent.rakshasa.no/attachment/wiki/RTorrentCommonTasks/rtorrentInit.bash?format=raw -O /etc/init.d/rtorrent
+wget http://libtorrent.rakshasa.no/attachment/wiki/RTorrentCommonTasks/rtorrentInit.sh?format=raw -O /etc/init.d/rtorrent
+#wget http://libtorrent.rakshasa.no/attachment/wiki/RTorrentCommonTasks/rtorrentInit.bash?format=raw -O /etc/init.d/rtorrent
+
 perl -pi -e "s/user=\"user\"/user=\"rtorrent\"/g" /etc/init.d/rtorrent
 
 chmod +x /etc/init.d/rtorrent
