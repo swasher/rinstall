@@ -220,8 +220,8 @@ End-of-auth
 # htdigest так же зависит от apache2-utils
 
 #Method 1
-hash=`echo -n "$USERWEB:$REALMWEB:$PASSWEB" | md5sum | cut -b -32`
-echo "$USERWEB:$REALMWEB:$hash" > /etc/lighttpd/htdigest
+#hash=`echo -n "$USERWEB:$REALMWEB:$PASSWEB" | md5sum | cut -b -32`
+#echo "$USERWEB:$REALMWEB:$hash" > /etc/lighttpd/htdigest
 #Method 2
 echo ${USERWEB}:${REALMWEB}:$(printf "${USERWEB}:${REALMWEB}:${PASSWEB}" | md5sum - | sed -e 's/\s\+-//') >>  /etc/lighttpd/htdigest
 
