@@ -9,6 +9,7 @@ PASS=pass
 #login and password for access rutorrent (user NOT created)
 USERWEB=rtorrent
 PASSWEB=bingo
+REALMWEB="rTorrent RPC"
 
 #Choose web server
 #WEBSERVER=apache
@@ -218,9 +219,15 @@ End-of-auth
 # Скрипт пишет файл напрямую, потому что htdigest спрашивает пароль из терминала
 # htdigest так же зависит от apache2-utils
 
-hash=`echo -n "$USERWEB:RPC:$PASSWEB" | md5sum | cut -b -32`
-echo "$USERWEB:RPC:$hash" > /etc/lighttpd/htdigest
+
+hash=`echo -n "$USERWEB:$REALMWEB:$PASSWEB" | md5sum | cut -b -32`
+echo "$USERWEB:$REALMWEB:$hash" > /etc/lighttpd/htdigest
+
+echo ${USERWEB}:${REALMWEB}:$(printf "${USERWEB}:${REALMWEB}:${PASSWEB}" | md5sum - | sed -e 's/\s\+-//') >>  /etc/lighttpd/htdigest
+
+
 chmod 644 /etc/lighttpd/htdigest
+
 
 lighttpd-enable-mod fastcgi
 lighttpd-enable-mod scgi
